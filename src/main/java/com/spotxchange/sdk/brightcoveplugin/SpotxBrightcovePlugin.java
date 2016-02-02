@@ -17,6 +17,7 @@ import com.brightcove.player.event.EventEmitter;
 import com.brightcove.player.event.EventListener;
 import com.brightcove.player.event.EventType;
 import com.brightcove.player.event.ListensFor;
+
 import com.spotxchange.sdk.android.SpotxAdListener;
 import com.spotxchange.sdk.android.SpotxAdSettings;
 import com.spotxchange.sdk.android.SpotxAdView;
@@ -41,39 +42,12 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
     private ViewGroup _viewGroup;
     private Event _origEvent;
 
-    private final SpotxAdListener _spotxAdListener = new SpotxAdListener() {
-        @Override
-        public void adLoaded() {
-
-        }
-
-        @Override
-        public void adStarted() {
-
-        }
-
-        @Override
-        public void adCompleted() {
-            resume();
-        }
-
-        @Override
-        public void adError() {
-            resume();
-        }
-
-        @Override
-        public void adExpired() {
-            resume();
-        }
-
-        @Override
-        public void adClicked() {
-
-        }
-
-    };
-
+    /**
+     *
+     * @param emitter
+     * @param ctx
+     * @param vg
+     */
     public SpotxBrightcovePlugin(EventEmitter emitter, Context ctx, ViewGroup vg) {
         super(emitter, SpotxBrightcovePlugin.class);
         _viewGroup = vg;
@@ -85,20 +59,18 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
         addListener(EventType.CUE_POINT, new OnCuePointListener());
     }
 
-    // CUE_POINT happens after one or more cue points has been
-    // reached.
     private class OnCuePointListener implements EventListener {
         @Override
         public void processEvent(Event event) {
-            Log.v(TAG, "OnCuePointListener: " + event.properties);
+            Log.d(TAG, "OnCuePointListener: " + event.properties);
 
             if(_adSettings != null){
-                // Store the original event, so it can be emitted again
-                // upon resume.
+                // save original event
                 _origEvent = (Event) event.properties.get(Event.ORIGINAL_EVENT);
-
                 eventEmitter.emit(EventType.WILL_INTERRUPT_CONTENT);
 
+                // create new ad view
+                Log.d(TAG, "Creating SpotxAdView...");
                 _adView = new SpotxAdView(_ctx, _adSettings);
                 _adView.setVisibility(View.INVISIBLE);
                 _adView.setAdListener(_spotxAdListener);
@@ -113,17 +85,57 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
     }
 
     private void resume() {
+        // cleanup ad view
         _viewGroup.removeView(_adView);
         _adView = null;
 
+        // fire resume content event
         if (_origEvent == null) {
             _origEvent = new Event(EventType.PLAY);
             _origEvent.properties.put(Event.SKIP_CUE_POINTS, true);
         }
-
         Map<String, Object> properties = new HashMap<>();
         properties.put(Event.ORIGINAL_EVENT, _origEvent);
         eventEmitter.emit(EventType.WILL_RESUME_CONTENT, properties);
     }
+
+    private final SpotxAdListener _spotxAdListener = new SpotxAdListener() {
+        @Override
+        public void adLoaded() {
+            Log.d(TAG, "Ad Loaded!");
+            // TODO?
+        }
+
+        @Override
+        public void adStarted() {
+            Log.d(TAG, "Ad Started!");
+            // TODO?
+        }
+
+        @Override
+        public void adCompleted() {
+            Log.d(TAG, "Ad Completed!");
+            resume();
+        }
+
+        @Override
+        public void adError() {
+            Log.d(TAG, "Ad Error!");
+            resume();
+        }
+
+        @Override
+        public void adExpired() {
+            Log.d(TAG, "Ad Expired!");
+            resume();
+        }
+
+        @Override
+        public void adClicked() {
+            Log.d(TAG, "Ad Clicked!");
+            // TODO?
+        }
+
+    };
 
 }
