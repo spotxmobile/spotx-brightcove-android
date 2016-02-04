@@ -1,6 +1,3 @@
-/*
- *
- */
 package com.spotxchange.sdk.brightcoveplugin;
 
 import android.content.Context;
