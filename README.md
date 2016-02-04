@@ -41,4 +41,15 @@ Download the source code and import it as a library project in Android Studio or
 
 Get more information on how to do this [here](http://developer.android.com/tools/projects/index.html#LibraryProjects).
 
-## Configuration
+## Set Up
+
+To set up and use the SpotX plugin you need to init the plugin with the required SpotxAdSettings Object.
+```java
+SpotxBrightcovePlugin plugin = new SpotxBrightcovePlugin(brightcoveVideoView.getEventEmitter(), this, brightcoveVideoView);
+SpotxAdSettings adSettings = new SpotxAdSettings(YOUR_CHANNEL_ID, "www.yourdomain.com");
+plugin.init(adSettings);
+```
+
+### Usage
+
+You can follow [Brightcove's sample app](https://github.com/BrightcoveOS/android-plugin-guide/blob/master/sample/SamplePluginApplication/src/main/java/com/brightcove/player/application/MainActivity.java) on how to configure and use the plugin.
