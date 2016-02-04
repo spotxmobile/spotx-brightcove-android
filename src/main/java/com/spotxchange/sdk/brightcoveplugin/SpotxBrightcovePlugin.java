@@ -5,9 +5,10 @@ package com.spotxchange.sdk.brightcoveplugin;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.brightcove.player.event.AbstractComponent;
 import com.brightcove.player.event.Component;
@@ -77,12 +78,12 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
                 _adView = new SpotxAdView(_ctx, _adSettings);
                 _adView.setVisibility(View.INVISIBLE);
                 _adView.setAdListener(_spotxAdListener);
-                _viewGroup.addView(_adView, new RelativeLayout.LayoutParams(_viewGroup.getLayoutParams().width, _viewGroup.getLayoutParams().height));
+                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+                _viewGroup.addView(_adView, layoutParams);
                 _adView.init();
             }
             else{
-                // TODO
-                // Warn that adsettings are not set
+                throw new IllegalArgumentException("AdSettings cannot be null. Did you forget to call init()?");
             }
         }
     }
@@ -106,13 +107,12 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
         @Override
         public void adLoaded() {
             Log.d(TAG, "Ad Loaded!");
-            // TODO?
+            _adView.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void adStarted() {
             Log.d(TAG, "Ad Started!");
-            // TODO?
         }
 
         @Override
@@ -136,7 +136,7 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
         @Override
         public void adClicked() {
             Log.d(TAG, "Ad Clicked!");
-            // TODO?
+            // TODO
         }
 
     };

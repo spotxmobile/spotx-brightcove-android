@@ -3,7 +3,7 @@ buildscript {
       jcenter()
     }
     dependencies {
-      classpath 'com.android.tools.build:gradle:1.1.3'
+      classpath 'com.android.tools.build:gradle:1.5.0'
       classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
@@ -25,16 +25,16 @@ repositories {
 }
 
 dependencies {
-    compile 'com.spotxchange:spotx-sdk-android:2.0.0@aar'
+    compile 'com.spotxchange:spotx-sdk-android:2.0.+'
     compile "com.brightcove.player:android-sdk:4.+"
 
     testCompile 'junit:junit:4.12'
-    testCompile 'com.android.support:support-v4:22.0.+'
+    compile 'com.android.support:appcompat-v7:22.2.0'
 }
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    buildToolsVersion '22.0.1'
 
     defaultConfig {
         minSdkVersion 15
