@@ -1,7 +1,0 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.spotxchange.sdk.brightcoveplugin">
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="22"/>
-    <application/>
-</manifest>
