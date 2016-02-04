@@ -33,6 +33,9 @@ import java.util.Map;
         EventType.CUE_POINT,
 })
 
+/*
+ *
+ */
 public class SpotxBrightcovePlugin extends AbstractComponent implements Component {
     public static final String TAG = SpotxBrightcovePlugin.class.getSimpleName();
 

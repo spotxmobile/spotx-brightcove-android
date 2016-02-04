@@ -25,7 +25,6 @@ repositories {
 }
 
 dependencies {
-    //compile 'com.robbypond:mopub-android-sdk:3.7.0@aar'
     compile 'com.spotxchange:spotx-sdk-android:2.0.0@aar'
     compile "com.brightcove.player:android-sdk:4.+"
 
@@ -38,7 +37,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
         versionName version
