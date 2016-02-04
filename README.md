@@ -1,10 +1,10 @@
-##Who Can Use the Plugin
+## Who Can Use the Plugin
 
 To use the plugin, you need to be a SpotX publisher and use the Brightcove Player SDK for Android.
 
 ### Become a SpotXchange Publisher
 
-If you are not already a SpotXchange publisher, click [here](http://www.spotxchange.com/publishers/apply-to-become-a-spotx-publisher/) to apply.
+If you are not already a SpotX publisher, click [here](http://www.spotxchange.com/publishers/apply-to-become-a-spotx-publisher/) to apply.
 
 ## What the Plugin Does
 
