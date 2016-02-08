@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 
 import com.brightcove.player.event.AbstractComponent;
 import com.brightcove.player.event.Component;
@@ -25,13 +25,14 @@ import java.util.Map;
 
 @Emits(events = {
         EventType.WILL_INTERRUPT_CONTENT,
-        EventType.WILL_RESUME_CONTENT,
+        EventType.WILL_RESUME_CONTENT
 })
 @ListensFor(events = {
         EventType.CUE_POINT,
+        EventType.DID_STOP
 })
 
-/*
+/**
  *
  */
 public class SpotxBrightcovePlugin extends AbstractComponent implements Component {
@@ -43,7 +44,34 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
     private ViewGroup _viewGroup;
     private Event _origEvent;
 
+    private LayoutParams _lparams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+
     /**
+     * SpotxBrightcovePlugin Constructor
+     *
+     * @param emitter
+     * @param ctx
+     * @param vg
+     * @param adSettings
+     *
+     * @throws IllegalArgumentException
+     */
+    public SpotxBrightcovePlugin(EventEmitter emitter, Context ctx, ViewGroup vg, SpotxAdSettings adSettings) {
+        super(emitter, SpotxBrightcovePlugin.class);
+
+        if(adSettings == null){
+            throw new IllegalArgumentException("SpotxAdSettings cannot be null!");
+        }
+
+        _viewGroup = vg;
+        _ctx = ctx;
+        _adSettings = adSettings;
+        addListener(EventType.CUE_POINT, new OnCuePointListener());
+        addListener(EventType.DID_STOP, new OnStopListener());
+    }
+
+    /**
+     * Unsupported SpotxBrightcovePlugin Constructor
      *
      * @param emitter
      * @param ctx
@@ -51,46 +79,64 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
      */
     public SpotxBrightcovePlugin(EventEmitter emitter, Context ctx, ViewGroup vg) {
         super(emitter, SpotxBrightcovePlugin.class);
-        _viewGroup = vg;
-        _ctx = ctx;
+        throw new UnsupportedOperationException("This SpotxBrightcovePlugin constructor is not supported. Please consult documentation.");
     }
 
-    public void init(SpotxAdSettings adSettings){
-        _adSettings = adSettings;
-        addListener(EventType.CUE_POINT, new OnCuePointListener());
+    /**
+     * Removes the SpotxAdView from the view group
+     */
+    public void remove(){
+        if(_adView != null) {
+            _adView.setVisibility(View.GONE);
+            _adView.unsetAdListener();
+            _viewGroup.removeView(_adView);
+            _adView = null;
+        }
     }
 
+    /**
+     * Listens for the user set cues to play an ad
+     */
     private class OnCuePointListener implements EventListener {
         @Override
         public void processEvent(Event event) {
             Log.d(TAG, "OnCuePointListener: " + event.properties);
 
-            if(_adSettings != null){
-                // save original event
-                _origEvent = (Event) event.properties.get(Event.ORIGINAL_EVENT);
-                eventEmitter.emit(EventType.WILL_INTERRUPT_CONTENT);
+            // save original event
+            _origEvent = (Event) event.properties.get(Event.ORIGINAL_EVENT);
+            eventEmitter.emit(EventType.WILL_INTERRUPT_CONTENT);
 
-                // create new ad view
-                Log.d(TAG, "Creating SpotxAdView...");
-                _adView = new SpotxAdView(_ctx, _adSettings);
-                _adView.setVisibility(View.INVISIBLE);
-                _adView.setAdListener(_spotxAdListener);
-                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
-                _viewGroup.addView(_adView, layoutParams);
-                _adView.init();
+            // do the ad view
+            Log.d(TAG, "Creating SpotxAdView...");
+            if(_adView != null){
+                remove();
             }
-            else{
-                throw new IllegalArgumentException("AdSettings cannot be null. Did you forget to call init()?");
-            }
+
+            _adView = new SpotxAdView(_ctx, _adSettings);
+            _adView.setVisibility(View.INVISIBLE);
+            _adView.setAdListener(_spotxAdListener);
+            _viewGroup.addView(_adView, _lparams);
+            _adView.init();
         }
     }
 
-    private void resume() {
-        // cleanup ad view
-        _viewGroup.removeView(_adView);
-        _adView = null;
+    private class OnStopListener implements EventListener {
 
-        // fire resume content event
+        @Override
+        public void processEvent(Event event) {
+            Log.d(TAG, "OnStopListener: " + event.properties);
+            remove();
+        }
+    }
+
+    /**
+     * Cleans up the ad view and fires the original events and resumes the video content
+     */
+    private void resumeContent() {
+        // cleanup ad view
+        remove();
+
+        // fire resumeContent content event
         if (_origEvent == null) {
             _origEvent = new Event(EventType.PLAY);
             _origEvent.properties.put(Event.SKIP_CUE_POINTS, true);
@@ -115,27 +161,26 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
         @Override
         public void adCompleted() {
             Log.d(TAG, "Ad Completed!");
-            resume();
+            resumeContent();
         }
 
         @Override
         public void adError() {
             Log.d(TAG, "Ad Error!");
-            resume();
+            resumeContent();
         }
 
         @Override
         public void adExpired() {
             Log.d(TAG, "Ad Expired!");
-            resume();
+            resumeContent();
         }
 
         @Override
         public void adClicked() {
             Log.d(TAG, "Ad Clicked!");
-            // TODO
+            // TODO?
         }
-
     };
 
 }

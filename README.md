@@ -43,11 +43,10 @@ Get more information on how to do this [here](http://developer.android.com/tools
 
 ## Set Up
 
-To set up and use the SpotX plugin you need to init the plugin with the required SpotxAdSettings Object.
+To set up and use the SpotX plugin you need to construct the plugin with the required SpotxAdSettings Object.
 ```java
-SpotxBrightcovePlugin plugin = new SpotxBrightcovePlugin(brightcoveVideoView.getEventEmitter(), this, brightcoveVideoView);
 SpotxAdSettings adSettings = new SpotxAdSettings(YOUR_CHANNEL_ID, "www.yourdomain.com");
-plugin.init(adSettings);
+SpotxBrightcovePlugin plugin = new SpotxBrightcovePlugin(brightcoveVideoView.getEventEmitter(), this, brightcoveVideoView, adSettings);
 ```
 
 ### Usage
