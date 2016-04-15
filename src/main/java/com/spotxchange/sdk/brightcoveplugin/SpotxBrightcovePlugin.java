@@ -16,10 +16,12 @@ import com.brightcove.player.event.EventListener;
 import com.brightcove.player.event.EventType;
 import com.brightcove.player.event.ListensFor;
 
+import com.brightcove.player.model.CuePoint;
 import com.spotxchange.sdk.android.SpotxAdListener;
 import com.spotxchange.sdk.android.SpotxAdSettings;
 import com.spotxchange.sdk.android.SpotxAdView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,7 +106,13 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
 
             // save original event
             _origEvent = (Event) event.properties.get(Event.ORIGINAL_EVENT);
-            eventEmitter.emit(EventType.WILL_INTERRUPT_CONTENT);
+            ArrayList<CuePoint> points = (ArrayList<CuePoint>)event.properties.get(Event.CUE_POINTS);
+            if (null != points && points.size() > 0) {
+                if (points.get(0).getPositionType() == CuePoint.PositionType.POINT_IN_TIME) {
+                    // only emmit the WILL_INTERRUPT_CONTENT if a midroll cue point
+                    eventEmitter.emit(EventType.WILL_INTERRUPT_CONTENT);
+                }
+            }
 
             // do the ad view
             Log.d(TAG, "Creating SpotxAdView...");
@@ -117,6 +125,9 @@ public class SpotxBrightcovePlugin extends AbstractComponent implements Componen
             _adView.setAdListener(_spotxAdListener);
             _viewGroup.addView(_adView, _lparams);
             _adView.init();
+
+            // prevent default event behavior
+            event.preventDefault();
         }
     }
 
