@@ -1,3 +1,7 @@
+# IMPORTANT: As of SpotX Android SDK release 3.0.3, the Brightcove plugin has been included within the Android SDK.
+For more information about this change, visit [Brightcove Adapter for Android SpotX SDK 3.0](https://spotxmobile.github.io/adapters/brightcove/android-adapter/).  
+# 
+
 ## Who Can Use the Plugin
 
 To use the plugin, you need to be a SpotX publisher and use the Brightcove Player SDK for Android.
